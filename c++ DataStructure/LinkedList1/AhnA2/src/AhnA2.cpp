@@ -1,86 +1,202 @@
 //============================================================================
-// Name        : AhnA2.cpp
-// Author      : Ahn Seonghoon
+// Name        : SeonghoonPA1.cpp
+// Author      : Ahn SeongHoon
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
 #include <iostream>
-#include "LL.hpp"
 #include <string>
+
 using namespace std;
 
+class Student
+{
+public:
+  string studentName;
+  int studentID;
+};
+
+class LLnode
+{
+public:
+
+  LLnode *fwdPtr;
+  Student theData;
+};
+void push_front (LLnode *&llh, Student s) //pass reference, but referece type is pointer, parameter for header is *&
+{
+
+  LLnode *newNode  = new LLnode;    //memory allocate for llnode struct
+  newNode->theData = s;             //initialize theData from Student s
+  newNode->fwdPtr  = llh;           //In this case, llh is original node, original node should be placed after new node. after new node -> original node -> ... -> nullptr
+  llh = newNode;
+
+
+}
+
+void push_back(LLnode *&llh, Student s)
+{
+	LLnode *lastNode = llh;
+	// find the last node
+	while(lastNode != nullptr && lastNode ->fwdPtr != nullptr)
+	{
+		lastNode = lastNode -> fwdPtr;
+
+	}
+	// create a new node linked at the last node.
+	// if there is no last node, the list is empty, make the new node current header
+	LLnode *newNode = new LLnode;
+	newNode->fwdPtr = nullptr;
+	newNode->theData = s;
+
+	if(lastNode != nullptr)
+	{
+		lastNode->fwdPtr = newNode; //last node's next pointer point newNode
+
+	}
+	else
+	{
+		llh = newNode; //if no exist node in list
+
+	}
+
+}
+int list_length(LLnode *llh)
+{
+ LLnode *temp = llh;
+ int countNode = 0;     //counter variable, every loop it will increase by 1
+
+
+  while(temp != nullptr)
+  {
+    temp = temp->fwdPtr; //move to next node
+    countNode++;
+  }
+
+
+  return countNode;
+}
+
+
+// displays the data items in each node, producing a report that resembles the following:
+//	node 0 address -> 0x776dc0 data -> Willie Makeitt 123456789
+//	node 1 address -> 0x776e10 data->Betty Wont 234567890
+//	node 2 address -> 0x776e50 data->Mandy Lifeboats 345678901
+// If the list is empty, display a message - do no throw an exception.
+void display_nodes(LLnode *llh)
+{
+
+	LLnode *temp= llh;
+	int nodeCounter= 0;
+
+	//If the list is empty, display a message ?do not throw an exception.
+	if (temp == nullptr) {
+		cout << "The list is empty" << endl;
+		return;
+	}
+
+	while (temp != nullptr) {
+		cout << "node " << nodeCounter << " address -> " << temp <<
+			" data -> " << temp->theData.studentName << " " << temp->theData.studentID << endl;
+
+		temp = temp->fwdPtr; //access next node pointer
+		nodeCounter++;
+	}
+}
+
+// retrieves the contents of the node at the front. Does not remove the node.
+// If the list is empty, throws an exception.
+Student retrieve_front(LLnode* llh)
+{
+
+	if (llh == nullptr) {
+		throw ("linked list is empty");
+	}
+
+	return llh->theData;
+}
+Student retrieve_back(LLnode *llh)
+{
+
+	if (llh == nullptr) {
+
+		throw ("linked list is empty");
+	}
+
+	// find the last node
+	LLnode* lastNode = llh;
+	while (lastNode != nullptr && lastNode->fwdPtr != nullptr) {
+		lastNode = lastNode->fwdPtr;
+	}
+
+	return lastNode->theData;
+}
+
+// A user (aka main) defines and initializes linked list processing by defining
+// a linked list header for each linked list, for example:
+//	LLnode* theLLheader = nullptr;
+// Use the main provided for your testing.
+
 int main() {
-	//Step2 pass
-	LL <Student> ll1;
-	cout << "main: length of empty list - " << ll1.list_length() << endl;
-	ll1.display_list();
+
+	LLnode* theLLHeader1 = nullptr;
 	Student temp;
-	temp.data = "aaaaa";
-	temp.key = 12345;
-	ll1.push_front(temp);
-	temp.data = "bbbbb";
-	temp.key = 23456;
-	ll1.push_back(temp);
-	temp.data = "before aaaaa";
-	temp.key = 34567;
-	ll1.push_front(temp);
-	temp.data = "after bbbbb";
-	temp.key = 45678;
-	ll1.push_back(temp);
+	//Check throws well
+	//retrieve_front(theLLHeader1); //checked
+	//retrieve_back(theLLHeader1); //checked
 
-	cout << "main: length of list after 4 pushes - " << ll1.list_length() << endl;
-	ll1.display_list();
+
+	temp.studentName = "student1";
+	temp.studentID = 11111;
+	cout << "Main:  number of nodes in empty list " << list_length(theLLHeader1) << endl;
+	cout << "Main:  contents of LL1 nodes" << endl;
+	display_nodes(theLLHeader1);
+	push_front(theLLHeader1, temp);
+
+	//	push_front (theLLHeader2, {"Charlie",78901});	// not all compilers support this
+	cout << "Main:  number of nodes in list after 1 push - " << list_length(theLLHeader1) << endl;
+	cout << "Main:  contents of list after 1 push " << endl;
+	display_nodes(theLLHeader1);
+	temp.studentName = "student2";
+	temp.studentID = 22222;
+	push_back(theLLHeader1, temp);
+	temp.studentName = "student3";
+	temp.studentID = 33333;
+	push_front(theLLHeader1, temp);
+	temp.studentName = "student4";
+	temp.studentID = 44444;
+	push_back(theLLHeader1, temp);
+	cout << "Main:  number of nodes after 4 pushes - " << list_length(theLLHeader1) << endl;
+	cout << "Main:  contents of list after 4 pushes " << endl;
+	display_nodes(theLLHeader1);
+	temp = retrieve_front(theLLHeader1);
+	cout << "Main:  retrieve front: " << temp.studentName << " " << temp.studentID << endl;
+	temp = retrieve_back(theLLHeader1);
+	cout << "Main:  retrieve back: " << temp.studentName << " " << temp.studentID << endl;
 	cout << endl;
-//	//check destroy function
- //   ll1.destroy_list(); //destroy work!
- //   ll1.display_list();
-//  ll1.destroy_list(); //pass all condition for destroy
-//
-    temp = ll1.search_list (23456);
-    //debug point
-    //cout << temp.key << endl;
-       if (temp.key != 0)
-    		cout << "main: node with key 23456 found" << endl;
-    	else
-    		cout << "main: node with key 23456 not found - that's an error" << endl;
+	LLnode* theLLHeader2 = nullptr;
+	temp.studentName = "Adam";
+	temp.studentID = 15555;
+	push_front(theLLHeader2, temp);
+	temp.studentName = "Betty";
+	temp.studentID = 25555;
+	push_front(theLLHeader2, temp);
+	temp.studentName = "Charlie";
+	temp.studentID = 35555;
+	push_front(theLLHeader2, temp);
+	temp.studentName = "Donna";
+	temp.studentID = 45555;
+	push_back(theLLHeader2, temp);
+	temp.studentName = "Earnie";
+	temp.studentID = 55555;
+	push_back(theLLHeader2, temp);
+	temp.studentName = "Felicity";
+	temp.studentID = 65555;
+	push_back(theLLHeader2, temp);
+	cout << "Main:  contents of LL2 nodes" << endl;
+	display_nodes(theLLHeader2);
 
-       temp = ll1.search_list (23457);
-       	if (temp.key != 0)
-       		cout << "main: node with key 23457 found - that's an error" << endl;
-       	else
-       		cout << "main: node with key 23457 not found" << endl;
-       	//pass search_list all case
-
-       	bool b;
-       		b = ll1.delete_node (23456);
-       		//cout << "delete_node function ended" << endl;
-       		if (b)
-       			cout << "main: node with key 23456 deleted" << endl;
-       		else
-       			cout << "main: node with key 23456 not deleted - that's an error" << endl;
-
-       		cout << "main: length of list after delete - " << ll1.list_length() << endl;
-       		cout << "main: display of list after delete" << endl;
-       		ll1.display_list();
-
-       		ll1.destroy_list();
-       		cout << "main: length of list after destroy - " << ll1.list_length() << endl;
-       		cout << "main: display of list after destroy" << endl;
-       		ll1.display_list();
-       		cout << endl;
-       		//To check after Destroy, when header is nullptr push_back function works well
-//       	Student temp2;
-//       	temp2.key = 1444;
-//       	temp2.data = "alalalfoelfl";
-//       	ll1.push_back(temp2);
-//       	temp2.key = 55555;
-//       	temp2.data = "alalalfoelfl222";
-//       	ll1.push_back(temp2);
-//       	ll1.display_list();
-
-
-       		return 0;
-       	}
-
+	return 0;
+}
